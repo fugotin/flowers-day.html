@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<title>Happy Flowers Day</title>
+<style>
+  /* Reset and base */
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container {
+    max-width: 350px;
+    width: 90%;
+    height: 600px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #pressButton {
+    background: #ff69b4;
+    border: none;
+    border-radius: 30px;
+    padding: 20px 80px;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 6px 12px rgba(255, 20, 147, 0.4);
+    transition: background-color 0.3s ease;
+    user-select: none;
+    outline: none;
+  }
+  #pressButton:active {
+    background: #ff1493;
+    box-shadow: 0 4px 8px rgba(255, 20, 147, 0.6);
+    transform: scale(0.95);
+  }
+
+  #message {
+    margin-top: 30px;
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #c71585;
+    opacity: 0;
+    transition: opacity 1s ease;
+    text-align: center;
+  }
+
+  /* flower styling for flying animation */
+  .flower {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    font-size: 1.5rem;
+    will-change: transform, opacity;
+    animation-timing-function: ease-out;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <button id="pressButton" aria-label="Press button to celebrate flowers day">press</button>
+    <div id="message" aria-live="polite" role="region"></div>
+  </div>
+
+<script>
+  const button = document.getElementById('pressButton');
+  const message = document.getElementById('message');
+  const container = document.querySelector('.container');
+
+  // Flower emojis to use
+  const flowers = ['🌸','🌺','🌻','💐','🌷','🌼'];
+
+  // To generate random numbers in a range
+  function randomRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  // Create a flower element, animate it flying upward with random trajectory
+  function createFlower() {
+    const flower = document.createElement('div');
+    flower.className = 'flower';
+    flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+    flower.style.left = randomRange(20, 320) + 'px'; // within container width
+    flower.style.bottom = '50px'; // start near bottom where button is
+    flower.style.opacity = '1';
+    flower.style.fontSize = randomRange(16, 32) + 'px';
+
+    // Animation duration and properties
+    const duration = randomRange(3000, 4500);
+    const xOffset = randomRange(-100, 100);
+    const rotation = randomRange(-720, 720); // degrees rotation
+
+    let start = null;
+
+    function animate(time) {
+      if (!start) start = time;
+      const elapsed = time - start;
+      const progress = elapsed / duration;
+
+      if (progress < 1) {
+        // vertical fly upward
+        const y = 50 + progress * 400;
+        // horizontal sine wave drifting
+        const x = parseFloat(flower.style.left) + Math.sin(progress * Math.PI * 4) * 30 + (xOffset * progress);
+        flower.style.transform = `translate(${x - parseFloat(flower.style.left)}px, -${y}px) rotate(${rotation * progress}deg)`;
+        flower.style.opacity = 1 - progress;
+        requestAnimationFrame(animate);
+      } else {
+        flower.remove();
+      }
+    }
+
+    container.appendChild(flower);
+    requestAnimationFrame(animate);
+  }
+
+  button.addEventListener('click', () => {
+    // Show the message
+    message.textContent = "happy flowers day my love!";
+    message.style.opacity = '1';
+
+    // Generate multiple flowers flying out in quick succession
+    for (let i = 0; i < 20; i++) {
+      setTimeout(createFlower, i * 120);
+    }
+  });
+</script>
+</body>
+</html>
+
